@@ -3,10 +3,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 import mongoose from 'mongoose';
 import actions from './actions.js';
+import cors from 'cors';
 
 
 const app = express();
 
+app.use(cors());
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
