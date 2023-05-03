@@ -9,7 +9,6 @@ import GameItem from './components/GameItem';
 function App() {
 
   const baseURL = 'http://localhost:3001/api';
-
   const [games, setAllGames] = useState([]);
 
   const loadAllGames = async() => {
@@ -19,10 +18,12 @@ function App() {
     const data = await response.json();
     setAllGames(data.message);
   }
-
   useEffect(() => {
     loadAllGames();
   },[]);
+
+
+
 
   return (
     <Container>
@@ -33,7 +34,20 @@ function App() {
       </Row>
 
       <Row style={{marginTop:100}}>
-        <Col xl={3} xs={12}></Col>
+        <Col xl={3} xs={12}>
+
+          <Form>
+
+          <Form.Select aria-label="Default select example">
+            <option>Open this select menu</option>
+            <option value="1">One</option>
+            <option value="2">Two</option>
+            <option value="3">Three</option>
+          </Form.Select>
+
+          </Form>
+
+        </Col>
         <Col xl={9} xs={12}>
           <Row>
           {
