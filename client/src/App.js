@@ -10,6 +10,13 @@ function App() {
 
   const baseURL = 'http://localhost:3001/api';
   const [games, setAllGames] = useState([]);
+  const [genres, setAllGenres] = useState([]);
+
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedGameName, setSelectedGameName] = useState("");
+  const [selectedGamePrice, setSelectedGamePrice] = useState("");
+  const [selectedDescription, setSelectedDesription] = useState("");
+  const [selectedGameImage, setSelectedGameImage] = useState("");
 
   const loadAllGames = async() => {
     const response = await fetch(baseURL + "/readAllGames", {
@@ -18,9 +25,45 @@ function App() {
     const data = await response.json();
     setAllGames(data.message);
   }
+  const loadGenres = async() => {
+    const response = await fetch(baseURL + "/readAllGenres", {
+      method: 'GET'
+    });
+    const data = await response.json();
+    setAllGenres(data.message);
+  }
   useEffect(() => {
     loadAllGames();
+    loadGenres();
   },[]);
+
+  const addNewGame = async() => {
+    if(selectedGameName !== "" && selectedGamePrice !== "" && selectedGenre !== ""){
+
+
+      const response = await fetch(baseURL + "/createGame", {
+        method: 'POST',
+        headers: {
+          'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify({
+          genreId: selectedGenre,
+          gameName: selectedGameName,
+          gamePrice: selectedGamePrice,
+          gameDescription: selectedDescription,
+          gameImage: selectedGameImage
+        })
+      });
+
+      setSelectedGameName("");
+
+      const data = await response.json();
+      toast.success(`${data.message.gameName} was created`);
+      loadAllGames();
+    } else {
+      toast.error("Game name and price is require!!")
+    }
+  }
 
 
 
@@ -38,12 +81,34 @@ function App() {
 
           <Form>
 
-          <Form.Select aria-label="Default select example">
+          <Form.Select onChange={(e) => {setSelectedGenre(e.target.value)}}>
             <option>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+            {
+              genres.length > 0 && 
+              genres.map((genre) => (
+                <option value={genre._id}>{genre.genreName}</option>
+              ))
+            }
           </Form.Select>
+
+          <Form.Control type="text" value={selectedGameName} 
+            onChange={(e) => {setSelectedGameName(e.target.value)}} 
+            placeholder="Game name" style={{marginTop:10}} />
+
+          <Form.Control type="text" value={selectedGamePrice} 
+            onChange={(e) => {setSelectedGamePrice(e.target.value)}} 
+            placeholder="Game price" style={{marginTop:10}} />
+
+          <Form.Control type="text" value={selectedDescription} 
+            onChange={(e) => {setSelectedDesription(e.target.value)}} 
+            placeholder="Game description" style={{marginTop:10}} />
+
+          <Form.Control type="text" value={selectedGameImage} 
+            onChange={(e) => {setSelectedGameImage(e.target.value)}} 
+            placeholder="Game image url" style={{marginTop:10}} />
+
+
+            <Button variant='info' onClick={addNewGame} style={{marginTop:10, width:'100%'}}>Add New Game</Button>
 
           </Form>
 
@@ -52,7 +117,6 @@ function App() {
           <Row>
           {
             games.length > 0 ? 
-
               games.map((item) => (
                 <Col xl={3}>
                   <GameItem game={item} />
