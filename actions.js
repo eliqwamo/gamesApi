@@ -87,7 +87,7 @@ router.delete('/deleteGame/:gid', async(req,res) => {
     Game.findByIdAndDelete(gid)
     .then(results => {
         return res.status(200).json({
-            message: results
+            message: 'Game deleted!'
         })
     })
     .catch(error => {

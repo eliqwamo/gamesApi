@@ -3,7 +3,7 @@ import { Button,Container, Row, Col, Form, Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import Header from './components/Header';
 import GameItem from './components/GameItem';
 
 function App() {
@@ -36,6 +36,19 @@ function App() {
     loadAllGames();
     loadGenres();
   },[]);
+
+  const deleteGameById = async(gid) => {
+    try {
+      const response = await fetch(baseURL + "/deleteGame/" + gid, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      toast.success(data.message);
+      loadAllGames();
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   const addNewGame = async() => {
     if(selectedGameName !== "" && selectedGamePrice !== "" && selectedGenre !== ""){
@@ -72,9 +85,7 @@ function App() {
     <Container>
       <ToastContainer />
 
-      <Row>
-        <Col></Col>
-      </Row>
+      <Header />
 
       <Row style={{marginTop:100}}>
         <Col xl={3} xs={12}>
@@ -119,7 +130,7 @@ function App() {
             games.length > 0 ? 
               games.map((item) => (
                 <Col xl={3}>
-                  <GameItem game={item} />
+                  <GameItem deleteGameClick={() => {deleteGameById(item._id)}} game={item} loadAllGames={loadAllGames} />
                 </Col>
               ))
             : 
