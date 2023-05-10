@@ -1,14 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import { Button,Container, Row, Col, Form, Card } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Header from './components/Header';
-import GameItem from './components/GameItem';
+import React, { useState, useEffect } from "react";
+import { Button, Container, Row, Col, Form, Card } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Header from "./components/Header";
+import GameItem from "./components/GameItem";
+import axios from 'axios';
 
 function App() {
-
-  const baseURL = 'http://localhost:3001/api';
+  const baseURL = "http://localhost:3001/api";
   const [games, setAllGames] = useState([]);
   const [genres, setAllGenres] = useState([]);
 
@@ -18,54 +18,62 @@ function App() {
   const [selectedDescription, setSelectedDesription] = useState("");
   const [selectedGameImage, setSelectedGameImage] = useState("");
 
-  const loadAllGames = async() => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
+
+  const loadAllGames = async () => {
     const response = await fetch(baseURL + "/readAllGames", {
-      method: 'GET'
+      method: "GET",
     });
     const data = await response.json();
     setAllGames(data.message);
-  }
-  const loadGenres = async() => {
+  };
+  const loadGenres = async () => {
     const response = await fetch(baseURL + "/readAllGenres", {
-      method: 'GET'
+      method: "GET",
     });
     const data = await response.json();
     setAllGenres(data.message);
-  }
+  };
   useEffect(() => {
     loadAllGames();
     loadGenres();
-  },[]);
+  }, []);
 
-  const deleteGameById = async(gid) => {
+  const deleteGameById = async (gid) => {
     try {
       const response = await fetch(baseURL + "/deleteGame/" + gid, {
-        method: 'DELETE'
+        method: "DELETE",
       });
       const data = await response.json();
       toast.success(data.message);
       loadAllGames();
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
-  }
+  };
 
-  const addNewGame = async() => {
-    if(selectedGameName !== "" && selectedGamePrice !== "" && selectedGenre !== ""){
-
-
+  const addNewGame = async () => {
+    if (
+      selectedGameName !== "" &&
+      selectedGamePrice !== "" &&
+      selectedGenre !== ""
+    ) {
       const response = await fetch(baseURL + "/createGame", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type' : 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           genreId: selectedGenre,
           gameName: selectedGameName,
           gamePrice: selectedGamePrice,
           gameDescription: selectedDescription,
-          gameImage: selectedGameImage
-        })
+          gameImage: selectedGameImage,
+        }),
       });
 
       setSelectedGameName("");
@@ -74,12 +82,34 @@ function App() {
       toast.success(`${data.message.gameName} was created`);
       loadAllGames();
     } else {
-      toast.error("Game name and price is require!!")
+      toast.error("Game name and price is require!!");
     }
+  };
+
+  const createNewAccount = async() => {
+
+    if(firstName !== "" && lastName !== "" && email !== "" && password !== ""){
+
+      const user = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        mobile: mobile
+      }
+
+      axios.post(baseURL + '/account/createAccount',{user})
+      .then(results => {
+        toast.success(results.data.message.email);
+      })
+      .catch(error => {
+        toast.error(error);
+      })
+    } else {
+      toast.error("All inputs are required!!!");
+    }
+
   }
-
-
-
 
   return (
     <Container>
@@ -87,11 +117,70 @@ function App() {
 
       <Header />
 
-      <Row style={{marginTop:100}}>
+      <Row style={{ marginTop: 100 }}>
         <Col xl={3} xs={12}>
-
           <Form>
+            <Form.Control
+              type="text"
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+              }}
+              placeholder="First name"
+              style={{ marginTop: 10 }}
+            />
 
+            <Form.Control
+              type="text"
+              value={lastName}
+              onChange={(e) => {
+                setLastName(e.target.value);
+              }}
+              placeholder="Last name"
+              style={{ marginTop: 10 }}
+            />
+
+            <Form.Control
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+              placeholder="Email"
+              style={{ marginTop: 10 }}
+            />
+
+            <Form.Control
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+              placeholder="Password"
+              style={{ marginTop: 10 }}
+            />
+
+            <Form.Control
+              type="phone"
+              value={mobile}
+              onChange={(e) => {
+                setMobile(e.target.value);
+              }}
+              placeholder="Mobile"
+              style={{ marginTop: 10 }}
+            />
+
+            <Button
+              variant="info"
+              onClick={createNewAccount}
+              style={{ marginTop: 10, width: "100%" }}>
+              Sign Up
+            </Button>
+          </Form>
+
+
+
+          {/* <Form>
           <Form.Select onChange={(e) => {setSelectedGenre(e.target.value)}}>
             <option>Open this select menu</option>
             {
@@ -117,29 +206,30 @@ function App() {
           <Form.Control type="text" value={selectedGameImage} 
             onChange={(e) => {setSelectedGameImage(e.target.value)}} 
             placeholder="Game image url" style={{marginTop:10}} />
-
-
             <Button variant='info' onClick={addNewGame} style={{marginTop:10, width:'100%'}}>Add New Game</Button>
 
-          </Form>
-
+          </Form> */}
         </Col>
         <Col xl={9} xs={12}>
           <Row>
-          {
-            games.length > 0 ? 
+            {games.length > 0 ? (
               games.map((item) => (
                 <Col xl={3}>
-                  <GameItem deleteGameClick={() => {deleteGameById(item._id)}} game={item} loadAllGames={loadAllGames} />
+                  <GameItem
+                    deleteGameClick={() => {
+                      deleteGameById(item._id);
+                    }}
+                    game={item}
+                    loadAllGames={loadAllGames}
+                  />
                 </Col>
               ))
-            : 
-            <p>NOPE</p>
-          }
+            ) : (
+              <p>NOPE</p>
+            )}
           </Row>
         </Col>
       </Row>
-
     </Container>
   );
 }

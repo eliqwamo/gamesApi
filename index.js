@@ -4,7 +4,7 @@ dotenv.config();
 import mongoose from 'mongoose';
 import actions from './actions.js';
 import cors from 'cors';
-
+import accountController from './controllers/account.js';
 
 const app = express();
 
@@ -15,6 +15,7 @@ app.use(express.json());
 const port = process.env.PORT;
 
 app.use('/api', actions);
+app.use('/api/account', accountController);
 
 mongoose.connect(process.env.MONGO_URL)
 .then(results => {
