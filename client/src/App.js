@@ -86,10 +86,9 @@ function App() {
     }
   };
 
+
   const createNewAccount = async() => {
-
     if(firstName !== "" && lastName !== "" && email !== "" && password !== ""){
-
       const user = {
         firstName: firstName,
         lastName: lastName,
@@ -97,19 +96,38 @@ function App() {
         password: password,
         mobile: mobile
       }
-
       axios.post(baseURL + '/account/createAccount',{user})
       .then(results => {
         toast.success(results.data.message.email);
       })
       .catch(error => {
-        toast.error(error);
+        toast.error(error.response.data.message);
       })
     } else {
       toast.error("All inputs are required!!!");
     }
-
   }
+
+  const login = async() => {
+
+    if(email !== "" && password !== ""){
+      const user = {
+        email: email,
+        password: password
+      }
+
+      axios.post(baseURL + '/account/login',{user})
+      .then(results => {
+        toast.success(results.data.message);
+      })
+      .catch(error => {
+        toast.error(error.response.data.message);
+      })
+    } else {
+      toast.error("All inputs are required!!!");
+    }
+  }
+
 
   return (
     <Container>
@@ -175,6 +193,13 @@ function App() {
               onClick={createNewAccount}
               style={{ marginTop: 10, width: "100%" }}>
               Sign Up
+            </Button>
+
+            <Button
+              variant="primary"
+              onClick={login}
+              style={{ marginTop: 10, width: "100%" }}>
+              Login
             </Button>
           </Form>
 
