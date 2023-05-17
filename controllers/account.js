@@ -88,8 +88,12 @@ router.post('/login', async(req,res) => {
 })
 
 router.put('/verifyAccount', async(req,res) => {
-    const {email,verficationCode} = req.body;
-    Account.findOne({email:email, verficationCode:verficationCode})
+
+    const verify = req.body.verify;
+
+    console.log(verify);
+
+    Account.findOne({email: verify.email, verficationCode: verify.verficationCode})
     .then(account => {
         if(account){
             account.isVerified = true;

@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = props => {
 
@@ -14,6 +15,21 @@ const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [mobile, setMobile] = useState("");
+    const [code, setCode] = useState("");
+
+
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        if(localStorage.getItem("token")){
+            navigate('/dashboard')
+        } else {
+            navigate('/')
+        }
+    },[]);
+
+
 
 
     const [authView, setAuthView] = useState("loginView"); 
@@ -32,13 +48,14 @@ const Login = props => {
         axios.post(baseURL + '/account/createAccount',{user})
         .then(results => {
             toast.success(results.data.message.verficationCode);
+            localStorage.setItem('vdata', JSON.stringify(results.data.message.email))
             setAuthView("verifyView");
         })
         .catch(error => {
             toast.error(error.response.data.message);
         })
         } else {
-        toast.error("All inputs are required!!!");
+            toast.error("All inputs are required!!!");
         }
         }
 
@@ -50,7 +67,10 @@ const Login = props => {
         }
         axios.post(baseURL + '/account/login',{user})
         .then(results => {
-            toast.success(results.data.message);
+            //toast.success(results.data.message);
+            console.log(results);
+            localStorage.setItem("token", JSON.stringify(results.data.message));
+            navigate('/dashboard');
         })
         .catch(error => {
             toast.error(error.response.data.message);
@@ -60,6 +80,29 @@ const Login = props => {
         }
         }
 
+        const verifyMyCode = async() => {
+
+            if(code !== ""){
+                const remail = localStorage.getItem("vdata");
+                const verify = {
+                    email: JSON.parse(remail),
+                    verficationCode: code
+                }
+
+
+                axios.put(baseURL + '/account/verifyAccount',{verify})
+                .then(results => {
+                    toast.success(`Welcome ${results.data.message.firstName}`)
+                })
+                .catch(error => {
+                    toast.error(error.response.data.message);
+                })
+
+
+            } else {
+                toast.error("You didnt type any code");
+            }
+        }
 
     return(
         
@@ -132,13 +175,22 @@ const Login = props => {
 
                                     <Button variant="primary" style={{width:'100%', marginTop:15}} onClick={createNewAccount}>Sign Up</Button>
                                 </Form>
-                                <Button style={{marginTop:12}} variant="light" onClick={() => {setAuthView(!authView)}}>Back to login</Button>
+                                <Button style={{marginTop:12}} variant="light" onClick={() => {setAuthView("loginView")}}>Back to login</Button>
                             </>
                         )
                         :
                         authView === 'verifyView' ? (
                         <>
                             <h3 style={{marginTop:15}}>Verify code</h3>
+                            <p>Please type your verification code</p>
+                                <Form>
+                                    <Form.Group>
+                                        <Form.Label>Code</Form.Label>
+                                        <Form.Control type="text" value={code} onChange={(e) => {setCode(e.target.value)}} />
+                                    </Form.Group>
+                                    <Button variant="primary" style={{width:'100%', marginTop:15}} onClick={verifyMyCode}>Verify</Button>
+                                </Form>
+                                <Button style={{marginTop:12}} variant="light" onClick={() => {setAuthView("loginView")}}>Back to login</Button>
                         </>)
                         :
                         (
