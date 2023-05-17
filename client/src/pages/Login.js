@@ -14,7 +14,10 @@ const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [mobile, setMobile] = useState("");
-    const [loginView, setLoginView] = useState(true);
+
+
+    const [authView, setAuthView] = useState("loginView"); 
+    //registerView //verifyView //recoverView
 
 
       const createNewAccount = async() => {
@@ -28,7 +31,8 @@ const Login = props => {
         }
         axios.post(baseURL + '/account/createAccount',{user})
         .then(results => {
-            toast.success(results.data.message.email);
+            toast.success(results.data.message.verficationCode);
+            setAuthView("verifyView");
         })
         .catch(error => {
             toast.error(error.response.data.message);
@@ -36,8 +40,7 @@ const Login = props => {
         } else {
         toast.error("All inputs are required!!!");
         }
-    }
-
+        }
 
       const login = async() => {
         if(email !== "" && password !== ""){
@@ -55,12 +58,7 @@ const Login = props => {
         } else {
         toast.error("All inputs are required!!!");
         }
-    }
-
-
-
-
-
+        }
 
 
     return(
@@ -81,63 +79,72 @@ const Login = props => {
 
 
                     {
-                        loginView ? 
-                        (
-                    <>
-                        <h3 style={{marginTop:15}}>Welcome Aboard</h3>
-                        <p>Type your email and password to login</p>
-                        <Form>
-                            <Form.Group>
-                                <Form.Label>Email address</Form.Label>
-                                <Form.Control type="email" value={email} onChange={(e) => {setEmail(e.target.value)}} />
-                            </Form.Group>
+                        authView === 'loginView' ? (
+                            <>
+                                <h3 style={{marginTop:15}}>Welcome Aboard</h3>
+                                <p>Type your email and password to login</p>
+                                <Form>
+                                    <Form.Group>
+                                        <Form.Label>Email address</Form.Label>
+                                        <Form.Control type="email" value={email} onChange={(e) => {setEmail(e.target.value)}} />
+                                    </Form.Group>
 
-                            <Form.Group>
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" value={password} onChange={(e) => {setPassword(e.target.value)}} />
-                            </Form.Group>
+                                    <Form.Group>
+                                        <Form.Label>Password</Form.Label>
+                                        <Form.Control type="password" value={password} onChange={(e) => {setPassword(e.target.value)}} />
+                                    </Form.Group>
 
-                            <Button variant="primary" style={{width:'100%', marginTop:15}} onClick={login}>Sign In</Button>
-                        </Form>
-                        <Button style={{marginTop:12}} variant="light" onClick={() => {setLoginView(!loginView)}}>Don't have an account? Signup Now!</Button>
-                    </>
-                        ) 
-                        : 
-                        (
-                    <>
-                        <h3 style={{marginTop:15}}>Create New Account</h3>
-                        <p>Type your first and last name, mobile, email and password to sign up</p>
-                        <Form>
-                            <Form.Group>
-                                <Form.Label>First name</Form.Label>
-                                <Form.Control type="text" value={firstName} onChange={(e) => {setFirstName(e.target.value)}} />
-                            </Form.Group>
-
-                            <Form.Group>
-                                <Form.Label>Last name</Form.Label>
-                                <Form.Control type="text" value={lastName} onChange={(e) => {setLastName(e.target.value)}} />
-                            </Form.Group>
-
-                            <Form.Group>
-                                <Form.Label>Mobile</Form.Label>
-                                <Form.Control type="text" value={mobile} onChange={(e) => {setMobile(e.target.value)}} />
-                            </Form.Group>
-
-                            <Form.Group>
-                                <Form.Label>Email address</Form.Label>
-                                <Form.Control type="email" value={email} onChange={(e) => {setEmail(e.target.value)}} />
-                            </Form.Group>
-
-                            <Form.Group>
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" value={password} onChange={(e) => {setPassword(e.target.value)}} />
-                            </Form.Group>
-
-                            <Button variant="primary" style={{width:'100%', marginTop:15}} onClick={createNewAccount}>Sign Up</Button>
-                        </Form>
-                        <Button style={{marginTop:12}} variant="light" onClick={() => {setLoginView(!loginView)}}>Back to login</Button>
-                    </>
+                                    <Button variant="primary" style={{width:'100%', marginTop:15}} onClick={login}>Sign In</Button>
+                                </Form>
+                                <Button style={{marginTop:12}} variant="light" onClick={() => {setAuthView("registerView")}}>Don't have an account? Signup Now!</Button>
+                            </>
                         )
+                        : 
+                        authView === 'registerView' ? (
+                            <>
+                                <h3 style={{marginTop:15}}>Create New Account</h3>
+                                <p>Type your first and last name, mobile, email and password to sign up</p>
+                                <Form>
+                                    <Form.Group>
+                                        <Form.Label>First name</Form.Label>
+                                        <Form.Control type="text" value={firstName} onChange={(e) => {setFirstName(e.target.value)}} />
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Form.Label>Last name</Form.Label>
+                                        <Form.Control type="text" value={lastName} onChange={(e) => {setLastName(e.target.value)}} />
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Form.Label>Mobile</Form.Label>
+                                        <Form.Control type="text" value={mobile} onChange={(e) => {setMobile(e.target.value)}} />
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Form.Label>Email address</Form.Label>
+                                        <Form.Control type="email" value={email} onChange={(e) => {setEmail(e.target.value)}} />
+                                    </Form.Group>
+
+                                    <Form.Group>
+                                        <Form.Label>Password</Form.Label>
+                                        <Form.Control type="password" value={password} onChange={(e) => {setPassword(e.target.value)}} />
+                                    </Form.Group>
+
+                                    <Button variant="primary" style={{width:'100%', marginTop:15}} onClick={createNewAccount}>Sign Up</Button>
+                                </Form>
+                                <Button style={{marginTop:12}} variant="light" onClick={() => {setAuthView(!authView)}}>Back to login</Button>
+                            </>
+                        )
+                        :
+                        authView === 'verifyView' ? (
+                        <>
+                            <h3 style={{marginTop:15}}>Verify code</h3>
+                        </>)
+                        :
+                        (
+                        <>
+                            <h3 style={{marginTop:15}}>Forget Password</h3>
+                        </>)
                     }
 
                     
