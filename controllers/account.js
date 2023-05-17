@@ -87,7 +87,30 @@ router.post('/login', async(req,res) => {
     })
 })
 
-
+router.put('/verifyAccount', async(req,res) => {
+    const {email,verficationCode} = req.body;
+    Account.findOne({email:email, verficationCode:verficationCode})
+    .then(account => {
+        if(account){
+            account.isVerified = true;
+            account.save()
+            .then(account_updated => {
+                return res.status(200).json({
+                    message: account_updated
+                })
+            })
+        } else {
+            return res.status(401).json({
+                message: 'Something went wrong...'
+            })
+        }
+    })
+    .catch(error => {
+        return res.status(500).json({
+            message: error.message
+        })
+    })
+})
 
 
 
