@@ -8,18 +8,29 @@ import moment from 'moment';
 
 const RowEdit = props => {
 
-    const [title, setTitle] = useState(props.row.title);
-    const [review, setReview] = useState(props.row.review);
+    const [rowItem, setRowItem] = useState({
+        title: props.row.title,
+        review: props.row.review
+    });
+    const {title,review} = rowItem;
+
+    const updateRow = (e) => {
+        props.updateReviewsList(props.row.tid,e);
+        setRowItem((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }))
+    }
 
     return (
         <>
             <tr>
                 <td>{props.row.tid}</td>
                 <td>
-                    <Form.Control value={title} onChange={(e) => {setTitle(e.target.value)}} type="text" />
+                    <Form.Control name="title" value={title} onChange={(e) => {updateRow(e)}} type="text" />
                 </td>
                 <td>
-                    <Form.Control value={review} onChange={(e) => {setReview(e.target.value)}} type="text" placeholder="Type your review..." />
+                    <Form.Control name="review" value={review} onChange={(e) => {updateRow(e)}} type="text" placeholder="Type your review..." />
                 </td>
                 <td>{moment(props.row.createdAt).format("DD/MM/YYYY")}</td>
                 <td>
